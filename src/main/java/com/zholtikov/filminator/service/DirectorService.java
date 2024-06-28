@@ -29,11 +29,11 @@ public class DirectorService {
         return directorDao.findAll();
     }
 
-    public Director getDirectorById(Integer id) {
+    public Director getDirectorById(Long id) {
         return directorDao.findById(id);
     }
 
-    public void deleteDirector(int id) {
+    public void deleteDirector(Long id) {
         directorDao.deleteDirector(id);
     }
 

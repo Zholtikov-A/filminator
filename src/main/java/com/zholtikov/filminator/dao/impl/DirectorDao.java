@@ -31,7 +31,7 @@ public class DirectorDao implements DirectorStorage {
     }
 
     @Override
-    public Director findById(Integer id) {
+    public Director findById(Long id) {
         String sql = "select * from filminator.directors where director_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeDirector(rs), id)
                 .stream().findAny().orElseThrow(() -> new DirectorNotFoundException("Director with id " + id + " not found"));
@@ -78,7 +78,7 @@ public class DirectorDao implements DirectorStorage {
     }
 
     @Override
-    public void deleteDirector(int id) {
+    public void deleteDirector(Long id) {
         String sqlDeleteLink = "delete from filminator.film_directors where director_id = ?";
         jdbcTemplate.update(sqlDeleteLink, id);
         String sqlDeleteDirector = "delete from filminator.directors where director_id = ? ";

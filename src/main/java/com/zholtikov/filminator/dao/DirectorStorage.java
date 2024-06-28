@@ -8,12 +8,12 @@ public interface DirectorStorage {
 
     List<Director> findAll();
 
-    Director findById(Integer id);
+    Director findById(Long id);
 
     Director addDirector(Director director) throws CustomValidationException;
 
     Director updateDirector(Director director) throws CustomValidationException;
 
-    void deleteDirector(int id);
+    void deleteDirector(Long id);
 
 }

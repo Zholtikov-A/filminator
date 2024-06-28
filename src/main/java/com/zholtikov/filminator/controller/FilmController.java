@@ -51,7 +51,7 @@ public class FilmController {
     @DeleteMapping("{id}/like/{userId}")
     public Film removeLike(
             @PathVariable("id") @Positive Long filmId,
-            @PathVariable("userId") Long userId) {
+            @PathVariable("userId") @Positive Long userId) {
         return filmService.removeLike(filmId, userId);
     }
 
@@ -76,6 +76,15 @@ public class FilmController {
         filmService.deleteAllFilms();
     }
 
+
+  /*  @PutMapping("/{id}/score/{userId}")
+    public void scoreFilm(@PathVariable("id") @Positive Long filmId,
+                          @PathVariable("userId") @Positive Long userId,
+                          @RequestParam
+                          @Min(value = 1, message = "Minimum film score is \"1\" ")
+                          @Max(value = 10, message = "Maximum film score is \"10\" ") int score) {
+        filmService.scoreFilm(filmId, userId, score);
+    }*/
 
 }
 

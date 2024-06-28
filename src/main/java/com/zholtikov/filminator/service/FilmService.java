@@ -87,4 +87,12 @@ public class FilmService {
         filmDao.deleteAllFilms();
     }
 
+/*    public void scoreFilm(Long filmId, int userId, int score) {
+        userDao.checkUserExistence(userId);
+        filmDao.checkFilmExistence(filmId);
+        filmDao.removeLike(filmId, userId);
+     //   eventStorage.addScore(userId, id);
+    }*/
+
+
 }
