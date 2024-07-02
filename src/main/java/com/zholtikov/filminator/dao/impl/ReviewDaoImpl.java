@@ -2,7 +2,6 @@ package com.zholtikov.filminator.dao.impl;
 
 import com.zholtikov.filminator.dao.ReviewDao;
 import com.zholtikov.filminator.exceptions.ReviewNotFoundException;
-import com.zholtikov.filminator.exceptions.UserNotFoundException;
 import com.zholtikov.filminator.model.Review;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,9 +76,9 @@ public class ReviewDaoImpl implements ReviewDao {
     public Review getReview(Long reviewId) {
         final String sql = "select r.review_id, r.content, r.positive, r.user_id, r.film_id, " +
 
-                " sum(case when rul.helpful then 1  when not rul.helpful then -1 end) as useful" +
+                " coalesce(sum(case when rul.helpful then 1  when not rul.helpful then -1 end), 0 ) as useful" +
 
-                // " (sum(case when rul.helpful then 2 end) - sum(case when not rul.helpful then 10 end)) as useful" + // works too
+                // "  coalesce((sum(case when rul.helpful then 2 end) - sum(case when not rul.helpful then 10 end)), 0 ) as useful" + // works too
 
                 " from filminator.reviews as r " +
                 "left join filminator.reviews_users_link as rul on r.review_id = rul.review_id " +
@@ -101,9 +100,7 @@ public class ReviewDaoImpl implements ReviewDao {
         log.info("Получили все ревью");
 
         final String sql = "select r.review_id, r.content, r.positive, r.user_id, r.film_id, " +
-
-                " sum(case when rul.helpful then 1  when not rul.helpful then -1 end) as useful" +
-
+                " coalesce(sum(case when rul.helpful then 1  when not rul.helpful then -1 end), 0 ) as useful" +
                 " from filminator.reviews as r " +
                 "left join filminator.reviews_users_link as rul on r.review_id = rul.review_id " +
                 " group by r.review_id " +
@@ -121,12 +118,11 @@ public class ReviewDaoImpl implements ReviewDao {
     public List<Review> getFilmReviews(Long filmId, int count) {
 
         final String sql = "select r.review_id, r.content, r.positive, r.user_id, r.film_id, " +
-                " sum(case when rul.helpful then 1  when not rul.helpful then -1 end) as useful" +
+                " coalesce(sum(case when rul.helpful then 1  when not rul.helpful then -1 end), 0 ) as useful" +
                 " from filminator.reviews as r " +
                 "left join filminator.reviews_users_link as rul on r.review_id = rul.review_id " +
                 "where r.film_id = " + filmId +
                 " group by r.review_id " +
-              //  " order by sum(case when rul.helpful then 1  when not rul.helpful then -1 end) desc " +
                 " order by useful desc " +
                 " limit " + count;
         List<Optional<Review>> queryResult = jdbcTemplate.query(sql, this::makeReview);
@@ -192,37 +188,5 @@ public class ReviewDaoImpl implements ReviewDao {
             throw new ReviewNotFoundException("Review with id \"" + reviewId + "\" not found.");
         }
     }
-
-/*
-    private Review makeReview(ResultSet rs) throws SQLException {
-        Review reviewBuilt = Review.builder()
-                .reviewId(rs.getLong("review_id"))
-                .content(rs.getString("CONTENT"))
-                .isPositive(rs.getBoolean("POSITIVE"))
-                .userId(rs.getLong("USER_ID"))
-                .filmId(rs.getLong("FILM_ID"))
-                .build();
-*//*
-        Integer positive = jdbcTemplate.queryForObject("select COUNT(u.user_id) from filminator.users as u where user_id = 1",
-                Integer.class);*//*
-        Integer positive = 1;
-
-        Integer negative = 0;
-
-      *//*  Integer positive = jdbcTemplate.queryForObject("select count(*) from filminator.reviews_users_link where review_id = " + reviewBuilt.getReviewId() + " AND helpful = true",
-                Integer.class);
-
-        Integer negative = jdbcTemplate.queryForObject("select count(*) from filminator.reviews_users_link where review_id = " + reviewBuilt.getReviewId() + " AND helpful = false",
-                Integer.class);*//*
-
-     *//*        Integer positive = jdbcTemplate.queryForObject("select count(*) from filminator.reviews_users_link where review_id = ? AND helpful = true",
-                new Object[]{reviewBuilt.getReviewId()}, Integer.class);
-
-        Integer negative = jdbcTemplate.queryForObject("select count(*) from filminator.reviews_users_link where review_id = ? AND helpful = false",
-                new Object[]{reviewBuilt.getReviewId()}, Integer.class);*//*
-
-        reviewBuilt.setUseful(positive - negative);
-        return reviewBuilt;
-    }*/
 
 }
