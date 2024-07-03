@@ -1,6 +1,8 @@
 package com.zholtikov.filminator.service;
 
+import com.zholtikov.filminator.dao.EventDao;
 import com.zholtikov.filminator.dao.UserDao;
+import com.zholtikov.filminator.model.Event;
 import com.zholtikov.filminator.model.User;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 public class UserService {
 
     final UserDao userDao;
+    final EventDao eventDao;
 
     private User checkUserName(User user) {
         if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
@@ -40,8 +43,10 @@ public class UserService {
     public User addFriend(Long userId, Long friendId) {
         userDao.checkUserExistence(userId);
         userDao.checkUserExistence(friendId);
-
         userDao.addFriend(userId, friendId);
+
+        eventDao.addFriend(userId,friendId);
+
         log.info("Users with id \"" + userId +
                 "\" and \"" + friendId +
                 "\" are friends now!");
@@ -50,6 +55,9 @@ public class UserService {
 
     public User removeFriend(Long userId, Long friendId) {
         userDao.removeFriend(userId, friendId);
+
+        eventDao.removeFriend(userId,friendId);
+
         log.info("Users with id \"" + userId +
                 "\" and \"" + friendId +
                 "\" are not friends anymore!");
@@ -73,4 +81,15 @@ public class UserService {
         userDao.checkUserExistence(id);
         return userDao.findUserById(id);
     }
+
+
+    public List<Event> getEvents(Long userId) {
+        userDao.checkUserExistence(userId);
+        List<Event> events = eventDao.getEvents(userId);
+        if (events.isEmpty()) {
+            userDao.findUserById(userId);
+        }
+        return events;
+    }
+
 }

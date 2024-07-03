@@ -1,6 +1,6 @@
 package com.zholtikov.filminator.dao.impl;
 
-import com.zholtikov.filminator.dao.DirectorStorage;
+import com.zholtikov.filminator.dao.DirectorDao;
 import com.zholtikov.filminator.exceptions.DirectorNotFoundException;
 import com.zholtikov.filminator.model.Director;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +15,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class DirectorDao implements DirectorStorage {
+public class DirectorDaoImpl implements DirectorDao {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DirectorDao(JdbcTemplate jdbcTemplate) {
+    public DirectorDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

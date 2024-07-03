@@ -4,7 +4,7 @@ import com.zholtikov.filminator.model.Director;
 
 import java.util.List;
 
-public interface DirectorStorage {
+public interface DirectorDao {
 
     List<Director> findAll();
 

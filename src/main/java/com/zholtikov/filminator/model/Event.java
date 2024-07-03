@@ -15,7 +15,7 @@ public class Event {
     EventType eventType;
 
     public enum EventType {
-        SCORE, FRIEND, REVIEW
+        SCORE, FRIEND, REVIEW, LIKE
     }
 
     public enum Operation {

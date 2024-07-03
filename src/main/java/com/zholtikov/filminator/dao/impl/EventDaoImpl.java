@@ -18,7 +18,7 @@ import static com.zholtikov.filminator.model.Event.Operation.*;
 public class EventDaoImpl implements EventDao {
 
     private static final String QUERY_FOR_EVENT = "insert into " +
-            "EVENTS(TIMESTAMP, USER_ID, ENTITY_ID, OPERATION, EVENT_TYPE) VALUES (?, ?, ?, ?, ?)";
+            "filminator.events(TIMESTAMP, USER_ID, ENTITY_ID, OPERATION, EVENT_TYPE) VALUES (?, ?, ?, ?, ?)";
     private final JdbcTemplate jdbcTemplate;
 
     public EventDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -26,8 +26,8 @@ public class EventDaoImpl implements EventDao {
     }
 
     @Override
-    public List<Event> getEvents(Integer userId) {
-        String sqlQuery = "select* from EVENTS where USER_ID = ?";
+    public List<Event> getEvents(Long userId) {
+        String sqlQuery = "select* from filminator.events where USER_ID = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToEvent, userId);
     }
 
@@ -43,6 +43,17 @@ public class EventDaoImpl implements EventDao {
     private void insertIntoDB(Long userId, Long entityId, Event.Operation operation, Event.EventType eventType) {
         long timestamp = Instant.now().toEpochMilli();
         jdbcTemplate.update(QUERY_FOR_EVENT, timestamp, userId, entityId, operation.toString(), eventType.toString());
+    }
+
+
+    @Override
+    public void addLike(Long userId, Long filmId) {
+        insertIntoDB(userId, filmId, ADD, LIKE);
+    }
+
+    @Override
+    public void removeLike(Long userId, Long filmId) {
+        insertIntoDB(userId, filmId, REMOVE, LIKE);
     }
 
     @Override

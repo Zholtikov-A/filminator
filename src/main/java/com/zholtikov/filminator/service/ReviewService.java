@@ -39,7 +39,7 @@ public class ReviewService {
         userDao.checkUserExistence(review.getUserId());
         filmDao.checkFilmExistence(review.getFilmId());
         Review addedReview = reviewDao.addReview(review);
-        //       eventDao.addReview(addedReview.getUserId(), addedReview.getReviewId());
+               eventDao.addReview(addedReview.getUserId(), addedReview.getReviewId());
         return addedReview;
     }
 
@@ -49,7 +49,7 @@ public class ReviewService {
         filmDao.checkFilmExistence(review.getFilmId());
         Review updatedReview = reviewDao.updateReview(review);
 
-        //    eventDao.updateReview(updatedReview.getUserId(), updatedReview.getReviewId());
+            eventDao.updateReview(updatedReview.getUserId(), updatedReview.getReviewId());
         return updatedReview;
     }
 

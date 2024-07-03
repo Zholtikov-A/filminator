@@ -1,6 +1,6 @@
 package com.zholtikov.filminator.service;
 
-import com.zholtikov.filminator.dao.impl.DirectorDao;
+import com.zholtikov.filminator.dao.DirectorDao;
 import com.zholtikov.filminator.model.Director;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

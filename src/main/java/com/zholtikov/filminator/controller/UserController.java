@@ -1,5 +1,6 @@
 package com.zholtikov.filminator.controller;
 
+import com.zholtikov.filminator.model.Event;
 import com.zholtikov.filminator.model.User;
 import com.zholtikov.filminator.service.UserService;
 import jakarta.validation.Valid;
@@ -62,6 +63,13 @@ public class UserController {
     public List<User> findCommonFriends(@PathVariable("id") @Positive Long userId,
                                         @PathVariable("otherId") @Positive Long otherUserId) {
         return userService.findCommonFriends(userId, otherUserId);
+    }
+
+
+    @GetMapping("/{id}/feed")
+ //   @Operation(summary = "Get list of user actions")
+    public List<Event> getEvents(@PathVariable("id") @Positive Long userId) {
+        return userService.getEvents(userId);
     }
 
 }

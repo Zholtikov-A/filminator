@@ -1,5 +1,6 @@
 package com.zholtikov.filminator.service;
 
+import com.zholtikov.filminator.dao.EventDao;
 import com.zholtikov.filminator.dao.FilmDao;
 import com.zholtikov.filminator.dao.UserDao;
 import com.zholtikov.filminator.exceptions.FilmNotFoundException;
@@ -21,12 +22,15 @@ public class FilmService {
 
     FilmDao filmDao;
     UserDao userDao;
+    EventDao eventDao;
 
     public Film addLike(Long filmId, Long userId) {
         userDao.checkUserExistence(userId);
         filmDao.checkFilmExistence(filmId);
-
         filmDao.addLike(filmId, userId);
+
+        eventDao.addLike(userId,filmId);
+
         log.info("Like was added to film");
         return filmDao.findFilmById(filmId);
     }
@@ -35,6 +39,9 @@ public class FilmService {
         userDao.checkUserExistence(userId);
         filmDao.checkFilmExistence(filmId);
         filmDao.removeLike(filmId, userId);
+
+        eventDao.removeLike(userId,filmId);
+
         log.info("Like was removed from film");
         return filmDao.findFilmById(filmId);
     }
