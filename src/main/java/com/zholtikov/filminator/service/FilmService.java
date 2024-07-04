@@ -29,7 +29,7 @@ public class FilmService {
         filmDao.checkFilmExistence(filmId);
         filmDao.addLike(filmId, userId);
 
-        eventDao.addLike(userId,filmId);
+        eventDao.addLike(userId, filmId);
 
         log.info("Like was added to film");
         return filmDao.findFilmById(filmId);
@@ -40,7 +40,7 @@ public class FilmService {
         filmDao.checkFilmExistence(filmId);
         filmDao.removeLike(filmId, userId);
 
-        eventDao.removeLike(userId,filmId);
+        eventDao.removeLike(userId, filmId);
 
         log.info("Like was removed from film");
         return filmDao.findFilmById(filmId);
@@ -80,7 +80,7 @@ public class FilmService {
     }
 
     public List<Film> getDirectorsFilms(Long directorId, String sortBy) {
-        if (sortBy.equals("likes")){
+        if (sortBy.equals("likes")) {
             sortBy = "rate";
         } else sortBy = "f.release_date";
         return filmDao.getDirectorsFilms(directorId, sortBy);
@@ -93,6 +93,15 @@ public class FilmService {
     public void deleteAllFilms() {
         filmDao.deleteAllFilms();
     }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        userDao.checkUserExistence(userId);
+        userDao.checkUserExistence(friendId);
+        return filmDao.getCommonFilms(userId, friendId);
+    }
+
+
+
 
 /*    public void scoreFilm(Long filmId, int userId, int score) {
         userDao.checkUserExistence(userId);

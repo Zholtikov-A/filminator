@@ -24,4 +24,7 @@ public interface FilmDao {
     void deleteFilm(Long id);
 
     void deleteAllFilms();
+
+    List<Film> getCommonFilms(Long userId, Long friendId);
+
 }
