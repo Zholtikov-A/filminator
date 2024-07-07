@@ -235,12 +235,10 @@ public class FilmDaoImpl implements FilmDao {
                 "  KEY 'name' VALUE g.name" +
                 ")) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-
                 "json_arrayagg(json_object(" +
                 "  KEY 'id' VALUE d.director_id," +
                 "  KEY 'name' VALUE d.name" +
                 ")) as directors, " +
-
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -331,6 +329,143 @@ public class FilmDaoImpl implements FilmDao {
         }
         return films;
     }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE g.genre_id," +
+                "  KEY 'name' VALUE g.name" +
+                ")) as genres, " +
+                " COUNT(lk.user_id) as rate, " +
+                "json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE d.director_id," +
+                "  KEY 'name' VALUE d.name" +
+                ")) as directors, " +
+                "from filminator.films as f " +
+                "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
+                "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
+                "left join filminator.genre as g on fgl.genre_id = g.genre_id " +
+                "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
+                "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
+                "left join filminator.directors as d on fd.director_id = d.director_id " +
+                "group by f.film_id " +
+                "order by count(lk.user_id) DESC " +
+                "limit " + count;
+
+        List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
+        List<Film> films = new ArrayList<>();
+        for (Optional<Film> optionalFilm : queryResult) {
+            optionalFilm.ifPresent(films::add);
+        }
+        return films;
+    }
+
+    @Override
+    public List<Film> getPopularByGenreAndYear(int year, Long genreId, int count) {
+
+        final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE g.genre_id," +
+                "  KEY 'name' VALUE g.name" +
+                ")) as genres, " +
+                " COUNT(lk.user_id) as rate, " +
+                "json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE d.director_id," +
+                "  KEY 'name' VALUE d.name" +
+                ")) as directors, " +
+                "from filminator.films as f " +
+                "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
+                "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
+                "left join filminator.genre as g on fgl.genre_id = g.genre_id " +
+                "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
+                "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
+                "left join filminator.directors as d on fd.director_id = d.director_id " +
+                "where f.film_id in (select filminator.films_genre_link.film_id " +
+                "from filminator.films_genre_link where filminator.films_genre_link.genre_id = " +
+                genreId + "  ) " +
+                "and f.film_id in (select filminator.films.film_id " +
+                "from filminator.films where year(filminator.films.release_date) = " +
+                year + " ) " +
+                "group by f.film_id " +
+                "order by count(lk.user_id) DESC " +
+                "limit " + count;
+
+        List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
+        List<Film> films = new ArrayList<>();
+        for (Optional<Film> optionalFilm : queryResult) {
+            optionalFilm.ifPresent(films::add);
+        }
+        return films;
+    }
+
+
+    @Override
+    public List<Film> getPopularByYear(int year, int count) {
+        final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE g.genre_id," +
+                "  KEY 'name' VALUE g.name" +
+                ")) as genres, " +
+                " COUNT(lk.user_id) as rate, " +
+                "json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE d.director_id," +
+                "  KEY 'name' VALUE d.name" +
+                ")) as directors, " +
+                "from filminator.films as f " +
+                "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
+                "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
+                "left join filminator.genre as g on fgl.genre_id = g.genre_id " +
+                "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
+                "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
+                "left join filminator.directors as d on fd.director_id = d.director_id " +
+                "where year(f.release_date) = " + year + " " +
+                "group by f.film_id " +
+                "order by count(lk.user_id) DESC " +
+                "limit " + count;
+
+        List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
+        List<Film> films = new ArrayList<>();
+        for (Optional<Film> optionalFilm : queryResult) {
+            optionalFilm.ifPresent(films::add);
+        }
+        return films;
+    }
+
+    @Override
+    public List<Film> getPopularByGenre(Long genreId, int count) {
+        final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE g.genre_id," +
+                "  KEY 'name' VALUE g.name" +
+                ")) as genres, " +
+                " COUNT(lk.user_id) as rate, " +
+                "json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE d.director_id," +
+                "  KEY 'name' VALUE d.name" +
+                ")) as directors, " +
+                "from filminator.films as f " +
+                "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
+                "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
+                "left join filminator.genre as g on fgl.genre_id = g.genre_id " +
+                "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
+                "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
+                "left join filminator.directors as d on fd.director_id = d.director_id " +
+                "where f.film_id in (select filminator.films_genre_link.film_id " +
+                "from filminator.films_genre_link where filminator.films_genre_link.genre_id = " +
+                genreId + "  ) " +
+                "group by f.film_id " +
+                "order by count(lk.user_id) DESC " +
+                "limit " + count;
+
+        List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
+        List<Film> films = new ArrayList<>();
+        for (Optional<Film> optionalFilm : queryResult) {
+            optionalFilm.ifPresent(films::add);
+        }
+        return films;
+    }
+
 
     private Optional<Film> mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()

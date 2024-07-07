@@ -46,7 +46,7 @@ public class FilmService {
         return filmDao.findFilmById(filmId);
     }
 
-    public List<Film> findPopularFilms(Integer count) {
+/*    public List<Film> findPopularFilms(Integer count) {
         List<Film> films = filmDao.findAll();
         if (films.isEmpty()) {
             String message = "Film collection is empty.";
@@ -57,7 +57,7 @@ public class FilmService {
                 .sorted((film1, film2) -> film2.getRate() - film1.getRate())
                 .limit(count)
                 .collect(Collectors.toList());
-    }
+    }*/
 
     public Film create(Film film) {
         log.info("Film " + film.getName() + " was successfully saved!");
@@ -100,6 +100,17 @@ public class FilmService {
         return filmDao.getCommonFilms(userId, friendId);
     }
 
+    public List<Film> getPopularByGenreAndYear(int year, Long genreId, int count) {
+        if (year == 0 && genreId == 0) {
+            return filmDao.getPopularFilms(count);
+        } else if (genreId == 0) {
+            return filmDao.getPopularByYear(year, count);
+        } else if (year == 0) {
+            return filmDao.getPopularByGenre(genreId, count);
+        } else {
+            return filmDao.getPopularByGenreAndYear(year, genreId, count);
+        }
+    }
 
 
 
