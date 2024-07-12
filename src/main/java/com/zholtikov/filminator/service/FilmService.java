@@ -3,7 +3,6 @@ package com.zholtikov.filminator.service;
 import com.zholtikov.filminator.dao.EventDao;
 import com.zholtikov.filminator.dao.FilmDao;
 import com.zholtikov.filminator.dao.UserDao;
-import com.zholtikov.filminator.exceptions.FilmNotFoundException;
 import com.zholtikov.filminator.model.Film;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -110,6 +108,11 @@ public class FilmService {
         } else {
             return filmDao.getPopularByGenreAndYear(year, genreId, count);
         }
+    }
+
+    public List<Film> getRecommendFilms(Long userId) {
+        userDao.checkUserExistence(userId);
+        return filmDao.getRecommendFilms(userId);
     }
 
 

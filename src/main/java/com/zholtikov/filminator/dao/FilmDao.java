@@ -35,4 +35,5 @@ public interface FilmDao {
 
     List<Film> getPopularByGenre(Long genreId, int count);
 
+    List<Film> getRecommendFilms(Long userId);
 }

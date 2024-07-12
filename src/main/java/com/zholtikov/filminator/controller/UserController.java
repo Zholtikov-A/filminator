@@ -1,7 +1,9 @@
 package com.zholtikov.filminator.controller;
 
 import com.zholtikov.filminator.model.Event;
+import com.zholtikov.filminator.model.Film;
 import com.zholtikov.filminator.model.User;
+import com.zholtikov.filminator.service.FilmService;
 import com.zholtikov.filminator.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -20,6 +22,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
+    FilmService filmService;
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
@@ -67,9 +70,14 @@ public class UserController {
 
 
     @GetMapping("/{id}/feed")
- //   @Operation(summary = "Get list of user actions")
+    //   @Operation(summary = "Get list of user actions")
     public List<Event> getEvents(@PathVariable("id") @Positive Long userId) {
         return userService.getEvents(userId);
     }
 
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> recommendFilms(@PathVariable(value = "id") Long userId) {
+        return filmService.getRecommendFilms(userId);
+    }
 }

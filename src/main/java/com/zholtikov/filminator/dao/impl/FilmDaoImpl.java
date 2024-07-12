@@ -467,6 +467,48 @@ public class FilmDaoImpl implements FilmDao {
     }
 
 
+    @Override
+    public List<Film> getRecommendFilms(Long userId) {
+        String thisUserLikes = "select lk.film_id" +
+                " from filminator.likes_films_users_link as lk " +
+                " where lk.user_id = " + userId;
+        String usersWithSameLikes = "select user_id" +
+                " from filminator.likes_films_users_link" +
+                " where film_id in (" + thisUserLikes + ") and user_id != " + userId +
+                " group by user_id" +
+                " order by count(user_id) desc";
+        String recommendedFilmsIds = "select film_id" +
+                " from filminator.likes_films_users_link" +
+                " where user_id in (" + usersWithSameLikes +
+                ") and film_id not in (" + thisUserLikes + ")";
+        String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE g.genre_id," +
+                "  KEY 'name' VALUE g.name" +
+                ")) as genres, " +
+                " COUNT(lk.user_id) as rate, " +
+                "json_arrayagg(json_object(" +
+                "  KEY 'id' VALUE d.director_id," +
+                "  KEY 'name' VALUE d.name" +
+                ")) as directors, " +
+                "from filminator.films as f " +
+                "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
+                "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
+                "left join filminator.genre as g on fgl.genre_id = g.genre_id " +
+                "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
+                "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
+                "left join filminator.directors as d on fd.director_id = d.director_id " +
+                "where f.film_id in (" + recommendedFilmsIds + ") " +
+                "group by f.film_id ";
+        List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
+        List<Film> films = new ArrayList<>();
+        for (Optional<Film> optionalFilm : queryResult) {
+            optionalFilm.ifPresent(films::add);
+        }
+        return films;
+    }
+
+
     private Optional<Film> mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
                 .id(resultSet.getLong("film_id"))
