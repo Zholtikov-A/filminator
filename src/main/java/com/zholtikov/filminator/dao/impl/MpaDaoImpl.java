@@ -48,7 +48,7 @@ public class MpaDaoImpl implements MpaDao {
 
     @Override
     public void checkMpaExistence(Long id) {
-        final String sql = "select COUNT(mpa.mpa_rating_id), " +
+        final String sql = "select COUNT(mpa.mpa_rating_id) " +
                 "from filminator.mpa_rating as mpa " +
                 "where mpa.mpa_rating_id = ? ";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);

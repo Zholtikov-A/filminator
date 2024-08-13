@@ -141,17 +141,9 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> findAll() {
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
-
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -159,7 +151,7 @@ public class FilmDaoImpl implements FilmDao {
                 "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
                 "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
                 "left join filminator.directors as d on fd.director_id = d.director_id " +
-                "group by f.film_id ";
+                "group by f.film_id, m.mpa_rating_id";
 
         List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
         List<Film> films = new ArrayList<>();
@@ -169,7 +161,34 @@ public class FilmDaoImpl implements FilmDao {
         return films;
     }
 
+
+
     @Override
+    public Film findFilmById(Long id) {
+
+        final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
+                " COUNT(lk.user_id) as rate, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
+                "from filminator.films as f " +
+                "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
+                "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
+                "left join filminator.genre as g on fgl.genre_id = g.genre_id " +
+                "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
+                "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
+                "left join filminator.directors as d on fd.director_id = d.director_id " +
+                "where f.film_id = ? " +
+                "group by f.film_id, m.mpa_rating_id";
+
+        Optional<Film> optionalFilm = jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
+        if (optionalFilm.isEmpty()) {
+            throw new FilmNotFoundException("Film with id \"" + id + "\" not found.");
+        } else {
+            return optionalFilm.get();
+        }
+    }
+
+/*    @Override
     public Film findFilmById(Long id) {
 
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
@@ -200,7 +219,7 @@ public class FilmDaoImpl implements FilmDao {
         } else {
             return optionalFilm.get();
         }
-    }
+    }*/
 
 
     @Override
@@ -230,15 +249,9 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> getDirectorsFilms(Long directorId, String sortBy) {
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -247,7 +260,7 @@ public class FilmDaoImpl implements FilmDao {
                 "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
                 "left join filminator.directors as d on fd.director_id = d.director_id " +
                 "where d.director_id = " + directorId +
-                " group by f.film_id " +
+                "group by f.film_id, m.mpa_rating_id " +
                 "order by " + sortBy + " DESC";
 
         List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
@@ -298,16 +311,10 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) {
-        String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+        final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -321,7 +328,7 @@ public class FilmDaoImpl implements FilmDao {
                 "and f.film_id in (select friend_likes.film_id " +
                 "from filminator.likes_films_users_link as friend_likes where friend_likes.user_id = " +
                 friendId + " ) " +
-                "group by f.film_id ";
+                "group by f.film_id, m.mpa_rating_id";
         List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
         List<Film> films = new ArrayList<>();
         for (Optional<Film> optionalFilm : queryResult) {
@@ -333,15 +340,9 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> getPopularFilms(int count) {
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -349,7 +350,7 @@ public class FilmDaoImpl implements FilmDao {
                 "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
                 "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
                 "left join filminator.directors as d on fd.director_id = d.director_id " +
-                "group by f.film_id " +
+                "group by f.film_id, m.mpa_rating_id " +
                 "order by count(lk.user_id) DESC " +
                 "limit " + count;
 
@@ -365,15 +366,9 @@ public class FilmDaoImpl implements FilmDao {
     public List<Film> getPopularByGenreAndYear(int year, Long genreId, int count) {
 
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -387,7 +382,7 @@ public class FilmDaoImpl implements FilmDao {
                 "and f.film_id in (select filminator.films.film_id " +
                 "from filminator.films where year(filminator.films.release_date) = " +
                 year + " ) " +
-                "group by f.film_id " +
+                "group by f.film_id, m.mpa_rating_id " +
                 "order by count(lk.user_id) DESC " +
                 "limit " + count;
 
@@ -403,15 +398,9 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> getPopularByYear(int year, int count) {
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -420,7 +409,7 @@ public class FilmDaoImpl implements FilmDao {
                 "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
                 "left join filminator.directors as d on fd.director_id = d.director_id " +
                 "where year(f.release_date) = " + year + " " +
-                "group by f.film_id " +
+                "group by f.film_id, m.mpa_rating_id " +
                 "order by count(lk.user_id) DESC " +
                 "limit " + count;
 
@@ -435,15 +424,9 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public List<Film> getPopularByGenre(Long genreId, int count) {
         final String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -454,7 +437,7 @@ public class FilmDaoImpl implements FilmDao {
                 "where f.film_id in (select filminator.films_genre_link.film_id " +
                 "from filminator.films_genre_link where filminator.films_genre_link.genre_id = " +
                 genreId + "  ) " +
-                "group by f.film_id " +
+                "group by f.film_id, m.mpa_rating_id " +
                 "order by count(lk.user_id) DESC " +
                 "limit " + count;
 
@@ -465,7 +448,6 @@ public class FilmDaoImpl implements FilmDao {
         }
         return films;
     }
-
 
     @Override
     public List<Film> getRecommendFilms(Long userId) {
@@ -482,15 +464,9 @@ public class FilmDaoImpl implements FilmDao {
                 " where user_id in (" + usersWithSameLikes +
                 ") and film_id not in (" + thisUserLikes + ")";
         String sql = "select f.film_id, f.name as film_name, f.description, f.release_date, f.duration, " +
-                "m.mpa_rating_id, m.name as mpa_name, json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE g.genre_id," +
-                "  KEY 'name' VALUE g.name" +
-                ")) as genres, " +
+                "m.mpa_rating_id, m.name as mpa_name, json_agg(json_build_object('id', g.genre_id, 'name', g.name)) as genres, " +
                 " COUNT(lk.user_id) as rate, " +
-                "json_arrayagg(json_object(" +
-                "  KEY 'id' VALUE d.director_id," +
-                "  KEY 'name' VALUE d.name" +
-                ")) as directors, " +
+                "json_agg(json_build_object('id', d.director_id, 'name', d.name)) as directors " +
                 "from filminator.films as f " +
                 "left join filminator.mpa_rating as m on f.mpa_rating_id = m.mpa_rating_id " +
                 "left join filminator.films_genre_link as fgl on f.film_id = fgl.film_id " +
@@ -499,7 +475,7 @@ public class FilmDaoImpl implements FilmDao {
                 "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
                 "left join filminator.directors as d on fd.director_id = d.director_id " +
                 "where f.film_id in (" + recommendedFilmsIds + ") " +
-                "group by f.film_id ";
+                "group by f.film_id, m.mpa_rating_id";
         List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
         List<Film> films = new ArrayList<>();
         for (Optional<Film> optionalFilm : queryResult) {

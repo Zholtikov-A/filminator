@@ -17,8 +17,6 @@ import static com.zholtikov.filminator.model.Event.Operation.*;
 @Repository
 public class EventDaoImpl implements EventDao {
 
-    private static final String QUERY_FOR_EVENT = "insert into " +
-            "filminator.events(TIMESTAMP, USER_ID, ENTITY_ID, OPERATION, EVENT_TYPE) VALUES (?, ?, ?, ?, ?)";
     private final JdbcTemplate jdbcTemplate;
 
     public EventDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -42,7 +40,11 @@ public class EventDaoImpl implements EventDao {
 
     private void insertIntoDB(Long userId, Long entityId, Event.Operation operation, Event.EventType eventType) {
         long timestamp = Instant.now().toEpochMilli();
-        jdbcTemplate.update(QUERY_FOR_EVENT, timestamp, userId, entityId, operation.toString(), eventType.toString());
+      final String QUERY_FOR_EVENT = "insert into " +
+            "filminator.events(TIMESTAMP, USER_ID, ENTITY_ID, OPERATION, EVENT_TYPE) VALUES (" + timestamp + ", " +
+              userId + ", " + entityId + ", '" +  operation + "', '" + eventType + "' );";
+
+        jdbcTemplate.update(QUERY_FOR_EVENT);
     }
 
 
@@ -62,8 +64,8 @@ public class EventDaoImpl implements EventDao {
     }
 
     @Override
-    public void addFriend(Long userId, Long userId1) {
-        insertIntoDB(userId, userId1, ADD, FRIEND);
+    public void addFriend(Long userId, Long friendId) {
+        insertIntoDB(userId, friendId, ADD, FRIEND);
     }
 
     @Override

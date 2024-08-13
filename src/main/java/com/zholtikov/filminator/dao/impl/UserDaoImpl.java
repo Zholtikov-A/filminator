@@ -48,9 +48,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User update(User user) {
-        String sql = "update filminator.users set user_id = ?, email = ?, " +
+        String sql = "update filminator.users set email = ?, " +
                 "login = ?, name = ?, birthday = ?";
-        jdbcTemplate.update(sql, user.getId(), user.getEmail(),
+        jdbcTemplate.update(sql, user.getEmail(),
                 user.getLogin(), user.getName(), user.getBirthday());
         return findUserById(user.getId());
     }
@@ -68,7 +68,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findUserById(Long id) {
-        final String sql = "select * from filminator.users where USER_ID = ?";
+        final String sql = "select * from filminator.users where user_id = ?";
         Optional<User> optionalUser = jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User with id \"" + id + "\" not found.");
@@ -78,7 +78,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        String sql = "insert into filminator.friendship_user_to_user_link(USER_ID, friend_id) " +
+        String sql = "insert into filminator.friendship_user_to_user_link(user_id, friend_id) " +
                 "values(?,?)";
 
         jdbcTemplate.update(connection -> {

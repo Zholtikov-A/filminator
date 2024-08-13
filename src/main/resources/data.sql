@@ -1,4 +1,4 @@
-MERGE INTO filminator.genre KEY(genre_id)
+INSERT INTO filminator.genre (genre_id, name)
 VALUES (1, 'Комедия'),
        (2, 'Драма'),
        (3, 'Мультфильм'),
@@ -6,7 +6,7 @@ VALUES (1, 'Комедия'),
        (5, 'Документальный'),
        (6, 'Боевик');
 
-MERGE INTO filminator.mpa_rating KEY(mpa_rating_id)
+INSERT INTO filminator.mpa_rating (mpa_rating_id, name)
 VALUES (1, 'G'),
        (2, 'PG'),
        (3, 'PG-13'),
