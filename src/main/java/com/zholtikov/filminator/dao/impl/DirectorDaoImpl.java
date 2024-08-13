@@ -2,6 +2,7 @@ package com.zholtikov.filminator.dao.impl;
 
 import com.zholtikov.filminator.dao.DirectorDao;
 import com.zholtikov.filminator.exceptions.DirectorNotFoundException;
+import com.zholtikov.filminator.exceptions.UserNotFoundException;
 import com.zholtikov.filminator.model.Director;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -83,6 +84,15 @@ public class DirectorDaoImpl implements DirectorDao {
         jdbcTemplate.update(sqlDeleteLink, id);
         String sqlDeleteDirector = "delete from filminator.directors where director_id = ? ";
         jdbcTemplate.update(sqlDeleteDirector, id);
+    }
+
+    @Override
+    public void checkDirectorExistence(Long id) {
+        final String sql = "select COUNT(d.director_id) from filminator.directors as d where director_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        if (count == null || count == 0) {
+            throw new DirectorNotFoundException("Director with id \"" + id + "\" not found.");
+        }
     }
 
     private Director makeDirector(ResultSet rs) throws SQLException {

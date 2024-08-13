@@ -14,6 +14,8 @@ public interface DirectorDao {
 
     Director updateDirector(Director director) throws CustomValidationException;
 
+    void checkDirectorExistence(Long id);
+
     void deleteDirector(Long id);
 
 }

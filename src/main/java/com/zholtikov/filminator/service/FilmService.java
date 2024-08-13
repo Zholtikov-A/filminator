@@ -1,5 +1,6 @@
 package com.zholtikov.filminator.service;
 
+import com.zholtikov.filminator.dao.DirectorDao;
 import com.zholtikov.filminator.dao.EventDao;
 import com.zholtikov.filminator.dao.FilmDao;
 import com.zholtikov.filminator.dao.UserDao;
@@ -21,6 +22,7 @@ public class FilmService {
     FilmDao filmDao;
     UserDao userDao;
     EventDao eventDao;
+    DirectorDao directorDao;
 
     public Film addLike(Long filmId, Long userId) {
         userDao.checkUserExistence(userId);
@@ -78,6 +80,7 @@ public class FilmService {
     }
 
     public List<Film> getDirectorsFilms(Long directorId, String sortBy) {
+        directorDao.checkDirectorExistence(directorId);
         if (sortBy.equals("likes")) {
             sortBy = "rate";
         } else sortBy = "f.release_date";

@@ -259,9 +259,9 @@ public class FilmDaoImpl implements FilmDao {
                 "left join filminator.likes_films_users_link as lk on lk.film_id = f.film_id " +
                 "left join filminator.film_directors as fd on f.film_id = fd.film_id " +
                 "left join filminator.directors as d on fd.director_id = d.director_id " +
-                "where d.director_id = " + directorId +
+                "where d.director_id = " + directorId + " " +
                 "group by f.film_id, m.mpa_rating_id " +
-                "order by " + sortBy + " DESC";
+                "order by " + sortBy + " ASC";
 
         List<Optional<Film>> queryResult = jdbcTemplate.query(sql, this::mapRowToFilm);
         List<Film> films = new ArrayList<>();
