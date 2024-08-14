@@ -85,11 +85,7 @@ public class UserService {
 
     public List<Event> getEvents(Long userId) {
         userDao.checkUserExistence(userId);
-        List<Event> events = eventDao.getEvents(userId);
-        if (events.isEmpty()) {
-            userDao.findUserById(userId);
-        }
-        return events;
+        return eventDao.getEvents(userId);
     }
 
 }

@@ -104,7 +104,7 @@ public class ReviewDaoImpl implements ReviewDao {
                 " from filminator.reviews as r " +
                 "left join filminator.reviews_users_link as rul on r.review_id = rul.review_id " +
                 " group by r.review_id " +
-                " order by useful desc " +
+                " order by useful desc, r.review_id asc  " +
                 " limit " + count;
         List<Optional<Review>> queryResult = jdbcTemplate.query(sql, this::makeReview);
         List<Review> reviews = new ArrayList<>();
@@ -123,7 +123,7 @@ public class ReviewDaoImpl implements ReviewDao {
                 "left join filminator.reviews_users_link as rul on r.review_id = rul.review_id " +
                 "where r.film_id = " + filmId +
                 " group by r.review_id " +
-                " order by useful desc " +
+                " order by useful desc, r.review_id asc" +
                 " limit " + count;
         List<Optional<Review>> queryResult = jdbcTemplate.query(sql, this::makeReview);
         List<Review> reviews = new ArrayList<>();
@@ -135,7 +135,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
     @Override
     public Review likeReview(Long reviewId, Long userId) {
-        String sqlAddLike = "merge into filminator.reviews_users_link (review_id, user_id, helpful) values (?, ?, true)";
+        String sqlAddLike = "insert into filminator.reviews_users_link (review_id, user_id, helpful) values (?, ?, true)";
         jdbcTemplate.update(sqlAddLike, reviewId, userId);
         log.info("Лайк ревью с ID: " + reviewId);
         return getReview(reviewId);
@@ -152,7 +152,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
     @Override
     public Review dislikeReview(Long reviewId, Long userId) {
-        String sqlAddLike = "merge into filminator.reviews_users_link (review_id, user_id, helpful) values (?, ?, false)";
+        String sqlAddLike = "insert into filminator.reviews_users_link (review_id, user_id, helpful) values (?, ?, false)";
         jdbcTemplate.update(sqlAddLike, reviewId, userId);
         log.info("Поcтавили дислайк ревью с ID: " + reviewId);
         return getReview(reviewId);
