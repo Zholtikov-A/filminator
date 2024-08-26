@@ -2,6 +2,8 @@ package com.zholtikov.filminator.controller;
 
 import com.zholtikov.filminator.model.Director;
 import com.zholtikov.filminator.service.DirectorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/directors")
+@Tag(name = "Directors", description = "Requests for directors")
 public class DirectorController {
 
     private final DirectorService directorService;
@@ -23,6 +26,7 @@ public class DirectorController {
     }
 
     @GetMapping
+    @Operation(summary = "Get list of all directors")
     public List<Director> getDirectors() {
         List<Director> directors = directorService.getDirectors();
         log.info("Get directors list");

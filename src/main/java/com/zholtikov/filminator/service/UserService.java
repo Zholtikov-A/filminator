@@ -45,7 +45,7 @@ public class UserService {
         userDao.checkUserExistence(friendId);
         userDao.addFriend(userId, friendId);
 
-        eventDao.addFriend(userId,friendId);
+        eventDao.addFriend(userId, friendId);
 
         log.info("Users with id \"" + userId +
                 "\" and \"" + friendId +
@@ -56,7 +56,7 @@ public class UserService {
     public User removeFriend(Long userId, Long friendId) {
         userDao.removeFriend(userId, friendId);
 
-        eventDao.removeFriend(userId,friendId);
+        eventDao.removeFriend(userId, friendId);
 
         log.info("Users with id \"" + userId +
                 "\" and \"" + friendId +
@@ -86,6 +86,11 @@ public class UserService {
     public List<Event> getEvents(Long userId) {
         userDao.checkUserExistence(userId);
         return eventDao.getEvents(userId);
+    }
+
+    public User deleteUser(Long userId) {
+        userDao.checkUserExistence(userId);
+        return userDao.deleteUser(userId);
     }
 
 }

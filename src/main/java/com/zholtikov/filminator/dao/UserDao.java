@@ -22,5 +22,7 @@ public interface UserDao {
 
     User removeFriend(Long userId, Long friendId);
 
+    User deleteUser(Long userId);
+
     void checkUserExistence(Long id);
 }

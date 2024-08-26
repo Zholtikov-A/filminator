@@ -80,4 +80,10 @@ public class UserController {
     public List<Film> recommendFilms(@PathVariable(value = "id") Long userId) {
         return filmService.getRecommendFilms(userId);
     }
+
+    @DeleteMapping("/{id}")
+    public User deleteUser(@PathVariable("id") @Positive Long userId) {
+        return userService.deleteUser(userId);
+    }
+
 }

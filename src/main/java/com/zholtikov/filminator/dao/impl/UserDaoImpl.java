@@ -46,14 +46,48 @@ public class UserDaoImpl implements UserDao {
         return findUserById(key);
     }
 
-    @Override
+/*    @Override
     public User update(User user) {
         String sql = "update filminator.users set email = ?, " +
                 "login = ?, name = ?, birthday = ?";
         jdbcTemplate.update(sql, user.getEmail(),
                 user.getLogin(), user.getName(), user.getBirthday());
         return findUserById(user.getId());
+    }*/
+
+    @Override
+    public User update(User user) {
+/*        String sql ="INSERT INTO filminator.users (user_id, email, login, name, birthday) VALUES (?,?,?,?,?) " +
+                "ON CONFLICT (user_id) DO UPDATE SET" +
+                " email = EXCLUDED.email, login = EXCLUDED.login, name = EXCLUDED.name, birthday = EXCLUDED.birthday;";*/
+
+
+      //  String sql = "INSERT INTO filminator.users (user_id, email, login, name) VALUES (1, 'gizmo@Transglobal', 'Gizmo Transglobal', 'fff') ON CONFLICT (user_id) DO UPDATE SET user_id = EXCLUDED.user_id;";
+        String sql = "INSERT INTO filminator.users (user_id, email, login, name, birthday) VALUES (1, 'mail@yandex.ru', 'doloreUpdate', 'est adipisicing', '1976-09-20') ON CONFLICT (user_id) DO UPDATE SET user_id = EXCLUDED.user_id, email = EXCLUDED.email, login = EXCLUDED.login, name = EXCLUDED.name, birthday = EXCLUDED.birthday;";
+
+     /*
+        String sql ="INSERT INTO filminator.users (user_id, email, login, name, birthday) VALUES (?,?,?,?,?) " +
+                "ON CONFLICT (user_id) DO UPDATE SET" +
+                "user_id = EXCLUDED.user_id, email = EXCLUDED.email, login = EXCLUDED.login, name = EXCLUDED.name, birthday = EXCLUDED.birthday;";
+*/
+     //   String sql ="INSERT INTO filminator.users (user_id, email, login, name, birthday) VALUES (1, 'mail@yandex.ru', 'doloreUpdate', 'est adipisicing', '1976-09-20') ON CONFLICT (user_id) DO UPDATE SET email = EXCLUDED.email, login = EXCLUDED.login, name = EXCLUDED.name, birthday = EXCLUDED.birthday;";
+
+       /* String sql = "insert into filminator.users(user_id, email, login, name, birthday) " +
+                "values(?,?,?,?,?) on conflict DO UPDATE SET login = 'ddd';"
+               ;*/
+
+    /*    String sql = "insert into filminator.users(email, login, name, birthday) " +
+                "values(?,?,?,?) ON CONFLICT (email) DO UPDATE SET login = 'ddd';"
+                ;*/
+        jdbcTemplate.update(sql);
+
+        /*jdbcTemplate.update(sql, user.getId(), user.getEmail(),
+                user.getLogin(), user.getName(), user.getBirthday());*/
+        return findUserById(user.getId());
     }
+
+   // INSERT INTO distributors (did, dname) VALUES (7, 'Redline GmbH')
+  //  ON CONFLICT (did) DO NOTHING;
 
     @Override
     public List<User> findAll() {
@@ -128,6 +162,34 @@ public class UserDaoImpl implements UserDao {
         return findUserById(userId);
     }
 
+    @Override
+    public User deleteUser(Long userId) {
+            String sql = "update filminator.users set email = 'deleted.user@deleted" + userId + ".del', " +
+                    "login = 'deleted_user_" + userId + "', name = 'deleted_user', birthday = '01-01-01'";
+            jdbcTemplate.update(sql);
+            return findUserById(userId);
+        }
+
+
+
+       /* String sqlDeleteUser = "delete from USERS where USER_ID = ?";
+        String sqlDeleteUserFromFriends1 = "delete from USER_FRIENDS where INITIATOR_ID = ?";
+        String sqlDeleteUserFromFriends2 = "delete from USER_FRIENDS where ACCEPTOR_ID = ?";
+        String sqlDeleteUserLike = "delete from FILM_SCORES where USER_ID = ?";
+        String sqlDeleteReviewLike = "delete from REVIEW_LIKES where USER_ID = ?";
+        String sqlDeleteEvent = "delete from EVENTS where USER_ID = ?";*/
+        //   String sqlDeleteFilm = "delete from filminator.films where film_id = " + id + " ;" ; // это если через каскад с схеме
+   //     String sql = "delete from filminator.films_genre_link where film_id = " + id +
+
+      /*  String sql = "delete from filminator.films_genre_link where film_id = " + id +
+                " ; delete from filminator.likes_films_users_link where user_id = " + userId +
+                " ; delete from filminator.friendship_user_to_user_link where user_id = " + userId +
+                " ; delete from filminator.friendship_user_to_user_link where friend_id = " + userId +
+                " ; delete from filminator.users where user_id = " + userId;*/
+
+      //  jdbcTemplate.update(sql);
+   // }
+
     private Optional<User> mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         User user = User.builder()
                 .id(resultSet.getLong("USER_ID"))
@@ -138,6 +200,7 @@ public class UserDaoImpl implements UserDao {
                 .build();
         return Optional.of(user);
     }
+
 
     @Override
     public void checkUserExistence(Long id) {
