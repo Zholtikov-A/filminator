@@ -2,6 +2,8 @@ package com.zholtikov.filminator.controller;
 
 import com.zholtikov.filminator.model.Genre;
 import com.zholtikov.filminator.service.GenreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +21,19 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/genres")
+@Tag(name = "Genres", description = "Requests for genres")
 public class GenreController {
 
     private final GenreService genreService;
 
     @GetMapping
+    @Operation(summary = "Get list of all genres")
     public List<Genre> findAll() {
         return genreService.findAll();
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get genre by id")
     public Genre findGenreById(@PathVariable("id") @Positive Long id) {
         return genreService.findGenreById(id);
     }

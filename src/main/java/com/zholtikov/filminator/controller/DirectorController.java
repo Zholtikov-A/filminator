@@ -34,6 +34,7 @@ public class DirectorController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get director by id")
     public Director getDirectorById(@PathVariable Long id) {
         Director director = directorService.getDirectorById(id);
         log.info("Get director with id{}", id);
@@ -42,6 +43,7 @@ public class DirectorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add new director to database")
     public Director addDirector(@Valid @RequestBody Director director) {
         Director newDirector = directorService.addDirector(director);
         log.info("Add director with id{}", newDirector.getId());
@@ -49,14 +51,15 @@ public class DirectorController {
     }
 
     @PutMapping
+    @Operation(summary = "Update director in database")
     public Director updateDirector(@Valid @RequestBody Director director) {
         Director updatedDirector = directorService.updateDirector(director);
-
         log.info("Update director with id{}", director.getId());
         return updatedDirector;
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete director by id")
     public void deleteDirector(@PathVariable Long id) {
         directorService.deleteDirector(id);
         log.info("Remove director with id{}", id);
