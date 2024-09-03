@@ -15,8 +15,9 @@
     <groupId>com.zholtikov</groupId>
     <artifactId>filminator</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>filminator</name>
-    <description>Film recommendation service</description>
+    <description>Film recommendation com.zholtikov.filminator.filmservice.service</description>
     <url/>
     <licenses>
         <license/>
@@ -24,6 +25,10 @@
     <developers>
         <developer/>
     </developers>
+    <modules>
+        <module>userservice</module>
+        <module>filmservice</module>
+    </modules>
     <scm>
         <connection/>
         <developerConnection/>
@@ -31,7 +36,7 @@
         <url/>
     </scm>
     <properties>
-        <java.version>17</java.version>
+        <java.version>19</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -65,12 +70,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
         </dependency>
-
-        <!--        <dependency>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>h2</artifactId>
-                    <scope>runtime</scope>
-                </dependency>-->
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -108,6 +107,23 @@
             <version>2.1.0</version>
         </dependency>
 
+     <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>3.2.3</version>
+        </dependency>
+
+
+<!--        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>3.4.0</version>
+        </dependency>
 
     </dependencies>
 
@@ -132,12 +148,27 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
+                    <apiDocsUrl>http://localhost:8081/v3/api-docs</apiDocsUrl>
                     <outputFileName>openapi.json</outputFileName>
                     <outputDir>${project.build.directory}</outputDir>
                 </configuration>
             </plugin>
 
+        <!--    <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>userservice.filminator.com.zholtikov.filminator.filmservice.com.zholtikov.filminator.filmservice.FilminatorFilmService</mainClass>
+                </configuration>
+            </plugin>-->
+
+<!--            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.baeldung.spring.kafka.KafkaApplication</mainClass>
+                </configuration>
+            </plugin>-->
 
         </plugins>
     </build>
