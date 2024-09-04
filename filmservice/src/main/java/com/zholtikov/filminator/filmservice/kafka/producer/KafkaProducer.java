@@ -2,7 +2,7 @@
 package com.zholtikov.filminator.filmservice.kafka.producer;
 
 import com.zholtikov.filminator.filmservice.model.Director;
-import com.zholtikov.filminator.filmservice.model.MessageDto;
+import com.zholtikov.filminator.filmservice.model.EventMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -18,10 +18,10 @@ public class KafkaProducer {
     }
 
     @Autowired
-    private KafkaTemplate<String, MessageDto> kafkaDtoTemplate;
+    private KafkaTemplate<String, EventMessage> kafkaEventTemplate;
 
-    public void sendMessage(String topic, MessageDto message) {
-        kafkaDtoTemplate.send(topic, message);
+    public void sendEventMessage(String topic, EventMessage message) {
+        kafkaEventTemplate.send(topic, message);
     }
 
 

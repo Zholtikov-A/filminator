@@ -2,12 +2,16 @@ package com.zholtikov.filminator.filmservice.service;
 
 import com.zholtikov.filminator.filmservice.dao.EventDao;
 import com.zholtikov.filminator.filmservice.dao.UserDao;
+import com.zholtikov.filminator.filmservice.kafka.producer.KafkaProducer;
 import com.zholtikov.filminator.filmservice.model.Event;
+import com.zholtikov.filminator.filmservice.model.EventMessage;
+import com.zholtikov.filminator.filmservice.model.EventOperation;
 import com.zholtikov.filminator.filmservice.model.User;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +21,13 @@ import java.util.List;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserService {
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     final UserDao userDao;
     final EventDao eventDao;
+
+
 
     private User checkUserName(User user) {
         if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
@@ -45,7 +53,9 @@ public class UserService {
         userDao.checkUserExistence(friendId);
         userDao.addFriend(userId, friendId);
 
-        eventDao.addFriend(userId, friendId);
+        EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(friendId)
+                .operation(EventOperation.ADD_FRIEND).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
 
         log.info("Users with id \"" + userId +
                 "\" and \"" + friendId +
@@ -56,7 +66,10 @@ public class UserService {
     public User removeFriend(Long userId, Long friendId) {
         userDao.removeFriend(userId, friendId);
 
-        eventDao.removeFriend(userId, friendId);
+        EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(friendId)
+                .operation(EventOperation.REMOVE_FRIEND).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
+
 
         log.info("Users with id \"" + userId +
                 "\" and \"" + friendId +

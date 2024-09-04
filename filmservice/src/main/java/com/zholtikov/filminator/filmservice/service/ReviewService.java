@@ -4,28 +4,35 @@ import com.zholtikov.filminator.filmservice.dao.EventDao;
 import com.zholtikov.filminator.filmservice.dao.FilmDao;
 import com.zholtikov.filminator.filmservice.dao.ReviewDao;
 import com.zholtikov.filminator.filmservice.dao.UserDao;
+import com.zholtikov.filminator.filmservice.kafka.producer.KafkaProducer;
+import com.zholtikov.filminator.filmservice.model.EventMessage;
+import com.zholtikov.filminator.filmservice.model.EventOperation;
 import com.zholtikov.filminator.filmservice.model.Review;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
 
     ReviewDao reviewDao;
     UserDao userDao;
     FilmDao filmDao;
-    private final EventDao eventDao;
+    KafkaProducer kafkaProducer;
 
     @Autowired
-    public ReviewService(ReviewDao reviewDao, UserDao userDao,
-                         FilmDao filmDao, EventDao eventDao) {
+    public ReviewService(ReviewDao reviewDao, UserDao userDao, FilmDao filmDao, KafkaProducer kafkaProducer) {
         this.reviewDao = reviewDao;
         this.userDao = userDao;
         this.filmDao = filmDao;
-        this.eventDao = eventDao;
+        this.kafkaProducer = kafkaProducer;
     }
+
+
+
 /*    public ReviewService(ReviewDao reviewDao, @Qualifier("userDao") UserDao userDao,
                          @Qualifier("filmDao") FilmDao filmDao, EventDao eventDao) {
         this.reviewDao = reviewDao;
@@ -39,7 +46,9 @@ public class ReviewService {
         userDao.checkUserExistence(review.getUserId());
         filmDao.checkFilmExistence(review.getFilmId());
         Review addedReview = reviewDao.addReview(review);
-               eventDao.addReview(addedReview.getUserId(), addedReview.getReviewId());
+        EventMessage eventMessage = EventMessage.builder().userId(review.getUserId()).targetId(review.getReviewId())
+                .operation(EventOperation.ADD_REVIEW).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
         return addedReview;
     }
 
@@ -49,7 +58,9 @@ public class ReviewService {
         filmDao.checkFilmExistence(review.getFilmId());
         Review updatedReview = reviewDao.updateReview(review);
 
-            eventDao.updateReview(updatedReview.getUserId(), updatedReview.getReviewId());
+        EventMessage eventMessage = EventMessage.builder().userId(review.getUserId()).targetId(review.getReviewId())
+                .operation(EventOperation.UPDATE_REVIEW).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
         return updatedReview;
     }
 
@@ -57,7 +68,9 @@ public class ReviewService {
         reviewDao.checkReviewExistence(reviewId);
         Review deletedReview = reviewDao.getReview(reviewId);
         reviewDao.deleteReview(reviewId);
-        eventDao.removeReview(deletedReview.getUserId(), reviewId);
+        EventMessage eventMessage = EventMessage.builder().userId(deletedReview.getUserId()).targetId(deletedReview.getReviewId())
+                .operation(EventOperation.REMOVE_REVIEW).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
     }
 
     public Review getReview(Long reviewId) {

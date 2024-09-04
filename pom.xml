@@ -26,7 +26,7 @@
         <developer/>
     </developers>
     <modules>
-        <module>userservice</module>
+        <module>eventservice</module>
         <module>filmservice</module>
     </modules>
     <scm>
@@ -158,7 +158,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>userservice.filminator.com.zholtikov.filminator.filmservice.com.zholtikov.filminator.filmservice.FilminatorFilmService</mainClass>
+                    <mainClass>eventservice.filminator.com.zholtikov.filminator.filmservice.com.zholtikov.filminator.filmservice.FilminatorFilmService</mainClass>
                 </configuration>
             </plugin>-->
 

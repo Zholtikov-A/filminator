@@ -1,15 +1,12 @@
 package com.zholtikov.filminator.filmservice.service;
 
 import com.zholtikov.filminator.filmservice.dao.DirectorDao;
-import com.zholtikov.filminator.filmservice.dao.EventDao;
 import com.zholtikov.filminator.filmservice.dao.FilmDao;
 import com.zholtikov.filminator.filmservice.dao.UserDao;
-
-
 import com.zholtikov.filminator.filmservice.kafka.producer.KafkaProducer;
-
+import com.zholtikov.filminator.filmservice.model.EventMessage;
+import com.zholtikov.filminator.filmservice.model.EventOperation;
 import com.zholtikov.filminator.filmservice.model.Film;
-import com.zholtikov.filminator.filmservice.model.MessageDto;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 
 
 @Service
@@ -33,30 +29,9 @@ public class FilmService {
 
     FilmDao filmDao;
     UserDao userDao;
-    EventDao eventDao;
     DirectorDao directorDao;
 
-    public Film addLike(Long filmId, Long userId) {
-        userDao.checkUserExistence(userId);
-        filmDao.checkFilmExistence(filmId);
-        filmDao.addLike(filmId, userId);
 
-        eventDao.addLike(userId, filmId);
-
-        log.info("Like was added to film");
-        return filmDao.findFilmById(filmId);
-    }
-
-    public Film removeLike(Long filmId, Long userId) {
-        userDao.checkUserExistence(userId);
-        filmDao.checkFilmExistence(filmId);
-        filmDao.removeLike(filmId, userId);
-
-        eventDao.removeLike(userId, filmId);
-
-        log.info("Like was removed from film");
-        return filmDao.findFilmById(filmId);
-    }
 
 /*    public List<Film> findPopularFilms(Integer count) {
         List<Film> films = filmDao.findAll();
@@ -73,12 +48,12 @@ public class FilmService {
 
     public Film create(Film film) {
 
-        String message = "Create film " + film.getName();
+  /*      String message = "Create film " + film.getName();
         kafkaProducer.sendMessage("string-topic", message);
 
 
-        MessageDto msgProd = MessageDto.builder().message("Name of DTO").version("1.0").build();
-        kafkaProducer.sendMessage("dto-topic", msgProd);
+        EventMessage msgProd = EventMessage.builder().message("Name of DTO").version("1.0").build();
+        kafkaProducer.sendMessage("dto-topic", msgProd);*/
 
 
         log.info("Film " + film.getName() + " was successfully saved!");
@@ -140,6 +115,34 @@ public class FilmService {
         return filmDao.getRecommendFilms(userId);
     }
 
+    public Film addLike(Long filmId, Long userId) {
+        userDao.checkUserExistence(userId);
+        filmDao.checkFilmExistence(filmId);
+        filmDao.addLike(filmId, userId);
+
+
+        EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(filmId)
+                .operation(EventOperation.ADD_LIKE).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
+        // eventDao.addLike(userId, filmId);
+
+        log.info("Like was added to film");
+        return filmDao.findFilmById(filmId);
+    }
+
+    public Film removeLike(Long filmId, Long userId) {
+        userDao.checkUserExistence(userId);
+        filmDao.checkFilmExistence(filmId);
+        filmDao.removeLike(filmId, userId);
+
+        EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(filmId)
+                .operation(EventOperation.REMOVE_LIKE).build();
+        kafkaProducer.sendEventMessage("event-topic", eventMessage);
+        //eventDao.removeLike(userId, filmId);
+
+        log.info("Like was removed from film");
+        return filmDao.findFilmById(filmId);
+    }
 
 
 /*    public void scoreFilm(Long filmId, int userId, int score) {

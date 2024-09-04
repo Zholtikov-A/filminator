@@ -3,7 +3,7 @@ package com.zholtikov.filminator.filmservice.kafka.producer;
 
 
 import com.zholtikov.filminator.filmservice.model.Director;
-import com.zholtikov.filminator.filmservice.model.MessageDto;
+import com.zholtikov.filminator.filmservice.model.EventMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +30,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, MessageDto> producerFactory() {
+    public ProducerFactory<String, EventMessage> producerEventFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -39,8 +39,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, MessageDto> kafkaDtoTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    public KafkaTemplate<String, EventMessage> kafkaDtoTemplate() {return new KafkaTemplate<>(producerEventFactory());
     }
 
     @Bean
