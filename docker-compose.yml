@@ -1,0 +1,36 @@
+services:
+
+  filmservice:
+    build: filmservice
+    image: filmservice-image
+    container_name: filminator-filmservice
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres_db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/filminator
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=iamroot
+
+
+  postgres_db:
+    image: postgres:13.7-alpine
+    volumes:
+      - /var/lib/postgresql/data/
+    container_name: db_postgres
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=filminator
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=iamroot
+
+
+
+
+
+
+
+
+
