@@ -1,5 +1,19 @@
 services:
 
+  userservice:
+    build: eventservice
+    image: eventservice-image
+    container_name: filminator-eventservice
+    ports:
+      - "8082:8082"
+    depends_on:
+      - filmservice
+      - postgres_db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/filminator
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=iamroot
+
   filmservice:
     build: filmservice
     image: filmservice-image
