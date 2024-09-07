@@ -51,11 +51,6 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/filminator
 
 
-
-
-
-
-
   postgres_db:
       image: postgres:13.7-alpine
       volumes:
