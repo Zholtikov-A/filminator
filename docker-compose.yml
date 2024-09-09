@@ -33,8 +33,7 @@ services:
     depends_on:
       - filmservice
       - postgres_db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/filminator
+
 
 
   filmservice:
@@ -46,9 +45,6 @@ services:
     depends_on:
       - kafka
       - postgres_db
-    environment:
-
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/filminator
 
 
   postgres_db:
