@@ -13,4 +13,5 @@ public class EventMessage {
     private Long userId;
     private Long targetId;
     private EventOperation operation;
+    private EventEntityType type;
 }

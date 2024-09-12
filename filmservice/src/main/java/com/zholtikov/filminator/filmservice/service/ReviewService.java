@@ -5,6 +5,7 @@ import com.zholtikov.filminator.filmservice.dao.FilmDao;
 import com.zholtikov.filminator.filmservice.dao.ReviewDao;
 import com.zholtikov.filminator.filmservice.dao.UserDao;
 import com.zholtikov.filminator.filmservice.kafka.producer.KafkaProducer;
+import com.zholtikov.filminator.filmservice.model.EventEntityType;
 import com.zholtikov.filminator.filmservice.model.EventMessage;
 import com.zholtikov.filminator.filmservice.model.EventOperation;
 import com.zholtikov.filminator.filmservice.model.Review;
@@ -47,7 +48,7 @@ public class ReviewService {
         filmDao.checkFilmExistence(review.getFilmId());
         Review addedReview = reviewDao.addReview(review);
         EventMessage eventMessage = EventMessage.builder().userId(review.getUserId()).targetId(review.getReviewId())
-                .operation(EventOperation.ADD_REVIEW).build();
+                .operation(EventOperation.ADD).type(EventEntityType.REVIEW).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
         return addedReview;
     }
@@ -59,7 +60,7 @@ public class ReviewService {
         Review updatedReview = reviewDao.updateReview(review);
 
         EventMessage eventMessage = EventMessage.builder().userId(review.getUserId()).targetId(review.getReviewId())
-                .operation(EventOperation.UPDATE_REVIEW).build();
+                .operation(EventOperation.UPDATE).type(EventEntityType.REVIEW).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
         return updatedReview;
     }
@@ -69,7 +70,7 @@ public class ReviewService {
         Review deletedReview = reviewDao.getReview(reviewId);
         reviewDao.deleteReview(reviewId);
         EventMessage eventMessage = EventMessage.builder().userId(deletedReview.getUserId()).targetId(deletedReview.getReviewId())
-                .operation(EventOperation.REMOVE_REVIEW).build();
+                .operation(EventOperation.REMOVE).type(EventEntityType.REVIEW).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
     }
 

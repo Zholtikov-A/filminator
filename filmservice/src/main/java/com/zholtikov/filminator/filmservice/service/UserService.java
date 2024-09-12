@@ -3,10 +3,7 @@ package com.zholtikov.filminator.filmservice.service;
 import com.zholtikov.filminator.filmservice.dao.EventDao;
 import com.zholtikov.filminator.filmservice.dao.UserDao;
 import com.zholtikov.filminator.filmservice.kafka.producer.KafkaProducer;
-import com.zholtikov.filminator.filmservice.model.Event;
-import com.zholtikov.filminator.filmservice.model.EventMessage;
-import com.zholtikov.filminator.filmservice.model.EventOperation;
-import com.zholtikov.filminator.filmservice.model.User;
+import com.zholtikov.filminator.filmservice.model.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -54,7 +51,7 @@ public class UserService {
         userDao.addFriend(userId, friendId);
 
         EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(friendId)
-                .operation(EventOperation.ADD_FRIEND).build();
+                .operation(EventOperation.ADD).type(EventEntityType.FRIEND).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
 
         log.info("Users with id \"" + userId +
@@ -67,7 +64,7 @@ public class UserService {
         userDao.removeFriend(userId, friendId);
 
         EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(friendId)
-                .operation(EventOperation.REMOVE_FRIEND).build();
+                .operation(EventOperation.REMOVE).type(EventEntityType.FRIEND).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
 
 

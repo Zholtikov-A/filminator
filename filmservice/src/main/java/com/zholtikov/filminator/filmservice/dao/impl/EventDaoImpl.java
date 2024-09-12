@@ -2,6 +2,8 @@ package com.zholtikov.filminator.filmservice.dao.impl;
 
 import com.zholtikov.filminator.filmservice.dao.EventDao;
 import com.zholtikov.filminator.filmservice.model.Event;
+import com.zholtikov.filminator.filmservice.model.EventEntityType;
+import com.zholtikov.filminator.filmservice.model.EventOperation;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -10,8 +12,8 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 
-import static com.zholtikov.filminator.filmservice.model.Event.EventType.*;
-import static com.zholtikov.filminator.filmservice.model.Event.Operation.*;
+import static com.zholtikov.filminator.filmservice.model.EventEntityType.*;
+import static com.zholtikov.filminator.filmservice.model.EventOperation.*;
 
 
 @Repository
@@ -34,11 +36,11 @@ public class EventDaoImpl implements EventDao {
                 resultSet.getLong("TIMESTAMP"),
                 resultSet.getLong("USER_ID"),
                 resultSet.getLong("ENTITY_ID"),
-                Event.Operation.valueOf(resultSet.getString("OPERATION")),
-                Event.EventType.valueOf(resultSet.getString("EVENT_TYPE")));
+                EventOperation.valueOf(resultSet.getString("OPERATION")),
+                EventEntityType.valueOf(resultSet.getString("EVENT_ENTITY_TYPE")));
     }
 
-    private void insertIntoDB(Long userId, Long entityId, Event.Operation operation, Event.EventType eventType) {
+    private void insertIntoDB(Long userId, Long entityId, EventOperation operation, EventEntityType eventType) {
         long timestamp = Instant.now().toEpochMilli();
       final String QUERY_FOR_EVENT = "insert into " +
             "filminator.events(TIMESTAMP, USER_ID, ENTITY_ID, OPERATION, EVENT_TYPE) VALUES (" + timestamp + ", " +
@@ -58,10 +60,10 @@ public class EventDaoImpl implements EventDao {
         insertIntoDB(userId, filmId, REMOVE, LIKE);
     }
 
-    @Override
+  /*  @Override
     public void addScore(Long userId, Long filmId) {
         insertIntoDB(userId, filmId, ADD, SCORE);
-    }
+    }*/
 
     @Override
     public void addFriend(Long userId, Long friendId) {
@@ -73,10 +75,12 @@ public class EventDaoImpl implements EventDao {
         insertIntoDB(userId, reviewId, ADD, REVIEW);
     }
 
+/*
     @Override
     public void removeScore(Long userId, Long filmId) {
         insertIntoDB(userId, filmId, REMOVE, SCORE);
     }
+*/
 
     @Override
     public void removeFriend(Long userId, Long userId1) {

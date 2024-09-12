@@ -140,7 +140,7 @@ create table IF NOT EXISTS filminator.reviews_users_link
 
 );
 
-create type filminator.EVENT as ENUM ('SCORE', 'FRIEND', 'REVIEW', 'LIKE');
+create type filminator.EVENT_ENTITY_TYPE as ENUM ('SCORE', 'FRIEND', 'REVIEW', 'LIKE');
 create type filminator.OPERATION as ENUM ('ADD', 'UPDATE', 'REMOVE');
 
 
@@ -150,8 +150,10 @@ create table IF NOT EXISTS filminator.events
     TIMESTAMP  bigint not null,
     USER_ID  INTEGER not null,
     ENTITY_ID  INTEGER not null,
-    OPERATION  filminator.OPERATION,
-    EVENT_TYPE  filminator.EVENT,
+    OPERATION  VARCHAR,
+   -- OPERATION  filminator.OPERATION,
+    --EVENT_ENTITY_TYPE  filminator.EVENT_ENTITY_TYPE,
+    EVENT_ENTITY_TYPE  VARCHAR,
    foreign key (user_id) references filminator.users (user_id)
 );
 

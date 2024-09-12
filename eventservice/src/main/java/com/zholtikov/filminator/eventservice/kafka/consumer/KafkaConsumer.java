@@ -21,7 +21,7 @@ public class KafkaConsumer {
 
     @KafkaListener(topics = "event-topic", containerFactory = "kafkaEventListenerContainerFactory", groupId = "my-group-id")
     public void listen(EventMessage eventMessage) {
-
+        System.out.println(eventMessage);
         eventService.createEvent(eventMessage);
 
     }

@@ -4,6 +4,7 @@ import com.zholtikov.filminator.filmservice.dao.DirectorDao;
 import com.zholtikov.filminator.filmservice.dao.FilmDao;
 import com.zholtikov.filminator.filmservice.dao.UserDao;
 import com.zholtikov.filminator.filmservice.kafka.producer.KafkaProducer;
+import com.zholtikov.filminator.filmservice.model.EventEntityType;
 import com.zholtikov.filminator.filmservice.model.EventMessage;
 import com.zholtikov.filminator.filmservice.model.EventOperation;
 import com.zholtikov.filminator.filmservice.model.Film;
@@ -122,7 +123,7 @@ public class FilmService {
 
 
         EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(filmId)
-                .operation(EventOperation.ADD_LIKE).build();
+                .operation(EventOperation.ADD).type(EventEntityType.LIKE).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
         // eventDao.addLike(userId, filmId);
 
@@ -136,7 +137,7 @@ public class FilmService {
         filmDao.removeLike(filmId, userId);
 
         EventMessage eventMessage = EventMessage.builder().userId(userId).targetId(filmId)
-                .operation(EventOperation.REMOVE_LIKE).build();
+                .operation(EventOperation.REMOVE).type(EventEntityType.LIKE).build();
         kafkaProducer.sendEventMessage("event-topic", eventMessage);
         //eventDao.removeLike(userId, filmId);
 

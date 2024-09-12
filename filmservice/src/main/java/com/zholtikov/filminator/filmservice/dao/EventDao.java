@@ -11,15 +11,13 @@ public interface EventDao {
 
     void removeLike(Long userId, Long filmId);
 
-
-
-    void addScore(Long userId, Long filmId);
+//    void addScore(Long userId, Long filmId);
 
     void addFriend(Long userId, Long userId1);
 
     void addReview(Long userId, Long reviewId);
 
-    void removeScore(Long userId, Long filmId);
+ //   void removeScore(Long userId, Long filmId);
 
     void removeFriend(Long userId, Long userId1);
 

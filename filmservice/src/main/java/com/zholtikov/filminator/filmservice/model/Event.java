@@ -11,14 +11,14 @@ public class Event {
     long timestamp;
     Long userId;
     Long entityId;
-    Operation operation;
-    EventType eventType;
+    EventOperation operation;
+    EventEntityType eventEntityType;
 
-    public enum EventType {
+/*    public enum EventEntityType {
         SCORE, FRIEND, REVIEW, LIKE
     }
 
     public enum Operation {
         ADD, UPDATE, REMOVE
-    }
+    }*/
 }
