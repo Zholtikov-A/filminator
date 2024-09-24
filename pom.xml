@@ -28,6 +28,8 @@
     <modules>
         <module>eventservice</module>
         <module>filmservice</module>
+        <module>service-registry</module>
+        <module>cloud-gateway</module>
     </modules>
     <scm>
         <connection/>

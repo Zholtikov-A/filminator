@@ -44,7 +44,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, EventMessage> kafkaDtoTemplate() {return new KafkaTemplate<>(producerEventFactory());
+    public KafkaTemplate<String, EventMessage> kafkaEventTemplate() {return new KafkaTemplate<>(producerEventFactory());
     }
 
     @Bean

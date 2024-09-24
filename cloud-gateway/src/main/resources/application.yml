@@ -1,0 +1,47 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: EVENT-SERVICE
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/event/**
+        - id: FILM-SERVICE
+          uri: lb://FILM-SERVICE
+          predicates:
+            - Path=/directors/**
+        - id: FILM-SERVICE
+          uri: lb://FILM-SERVICE
+          predicates:
+            - Path=/films/**
+        - id: FILM-SERVICE
+          uri: lb://FILM-SERVICE
+          predicates:
+            - Path=/genres/**
+        - id: FILM-SERVICE
+          uri: lb://FILM-SERVICE
+          predicates:
+            - Path=/mpa/**
+        - id: FILM-SERVICE
+          uri: lb://FILM-SERVICE
+          predicates:
+            - Path=/reviews/**
+        - id: FILM-SERVICE
+          uri: lb://FILM-SERVICE
+          predicates:
+            - Path=/users/**
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost

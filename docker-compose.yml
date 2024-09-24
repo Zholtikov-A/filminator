@@ -24,7 +24,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 
-  userservice:
+  eventservice:
     build: eventservice
     image: eventservice-image
     container_name: filminator-eventservice
