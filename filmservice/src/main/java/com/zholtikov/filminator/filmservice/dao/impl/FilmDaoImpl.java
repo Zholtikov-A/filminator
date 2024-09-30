@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class FilmDaoImpl implements FilmDao {
+public class  FilmDaoImpl implements FilmDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserDaoImpl userDao;

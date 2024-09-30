@@ -17,6 +17,7 @@ public class EventService {
 
     EventRepository eventRepository;
 
+
     public void createEvent(EventMessage eventMessage) {
         Event event = new Event(Instant.now().toEpochMilli(), eventMessage.getUserId(), eventMessage.getTargetId(), eventMessage.getOperation(), eventMessage.getType());
        eventRepository.save(event);
